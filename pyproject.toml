@@ -1,2 +1,0 @@
-[tool.streamlit]
-entrypoint = "app.py"

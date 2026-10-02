@@ -1,0 +1,27 @@
+{
+  "name": "netsense-dashboard",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "format": "prettier --write src vite.config.ts tsconfig.json package.json index.html"
+  },
+  "dependencies": {
+    "ipaddr.js": "^2.2.0",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "prettier": "^3.9.9",
+    "typescript": "~5.7.3",
+    "vite": "^6.4.1",
+    "vitest": "^3.2.4"
+  }
+}

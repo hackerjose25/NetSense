@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netsense-backend"
+version = "2.0.0"
+description = "Local packet capture and analysis API for the NetSense React dashboard"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = [
+    "fastapi>=0.135.1,<1",
+    "uvicorn[standard]>=0.42.0,<1",
+    "scapy>=2.5.0,<3",
+]
+
+[project.optional-dependencies]
+ml = [
+    "torch>=2.0.0",
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "scikit-learn>=1.3.0",
+    "joblib>=1.3.0",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.13.0",
+]
+dev = ["httpx>=0.28.1,<1", "playwright>=1.50.0,<2"]
+
+[project.scripts]
+netsense = "netsense.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,123 +1,142 @@
-# NetSense — AI-Powered Network Traffic Classifier & Live Telemetry
+# NetSense — Network Traffic Intelligence
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.40+-FF4B4B.svg?style=flat&logo=Streamlit&logoColor=white)](https://streamlit.io/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C.svg?style=flat&logo=PyTorch&logoColor=white)](https://pytorch.org/)
-[![Scapy](https://img.shields.io/badge/Scapy-Packet_Capture-008080.svg)](https://scapy.net/)
+NetSense is a local network monitoring and investigation application with a **React + TypeScript frontend** and a **Python FastAPI backend**. Scapy captures IPv4/IPv6 packet headers; the dashboard shows live measurements, connections, endpoint rankings, and saved sessions.
 
-> **NetSense** is an enterprise-grade, real-time packet intelligence dashboard and neural network traffic analyzer built with Python, Streamlit, Scapy, and PyTorch. 
-> 
-> Maintained & owned by **Jose Regish J** ([@hackerjose25](https://github.com/hackerjose25)) and the NetSense engineering team.
+## Start the React app
 
----
+Prerequisites: Python 3.10+, Node.js 20.18+ with npm, and a packet capture driver. On Windows, install [Npcap](https://npcap.com/) with WinPcap compatibility. On Linux/macOS, install libpcap and use the capture permissions required by your system.
 
-## ⚡ Key Features
-
-- **Real-Time Packet Ingestion**: Live IPv4 and IPv6 packet capture directly at the network adapter using Scapy with raw-socket / Npcap integration.
-- **Strictly Genuine Telemetry**: Zero mock data, simulated TCP windows, or synthetic fallback. Every displayed rate, protocol slice, and byte count comes directly from your physical or virtual network interface.
-- **Deep Learning Classification**: Built-in PyTorch LSTM classifier (`tcp_udp_lstm_pytorch.pt`) for sequence-level packet categorization and pattern inference.
-- **Glassmorphic Control Console**: Premium dark-mode interface inspired by advanced network telemetry consoles, featuring responsive typography, smooth state animations, and an interactive live dashboard.
-- **Packet Explorer & CSV Export**: Real-time packet table with timestamped packet sizes, source/destination IPs, ports, and instant CSV snapshot download (up to 2,000 packets).
-- **Session-Guarded Architecture**: Thread-safe background sniffer with automatic heartbeat timeouts, graceful adapter release, and isolated per-session states.
-
----
-
-## 🏗️ Architecture & Data Pipeline
-
-```text
-[ Network Interface ] (Wi-Fi / Ethernet / Loopback)
-        │
-        ▼
-[ Scapy Sniffer Thread ] (live_capture.py)
-   ├── Raw Packet Capture (Npcap / libpcap)
-   ├── Thread-safe Ring Buffer
-   └── Synchronized 1-second Rate Interval Aggregators
-        │
-        ├──► [ Live Telemetry Dashboard ] (live_dashboard.py / ui.py)
-        │       ├── Instant Throughput (packets/s & Mbit/s)
-        │       ├── Protocol Breakdown (TCP / UDP / ICMP / ARP)
-        │       └── Packet Detail Table & CSV Export
-        │
-        └──► [ Feature Extraction & ML Engine ] (app.py)
-                ├── Rolling 10-Timestep Sequences
-                ├── Scaler Normalization
-                └── PyTorch LSTM Inference (`tcp_udp_lstm_pytorch.pt`)
-```
-
----
-
-## 🚀 Quick Start
-
-### 1. Prerequisites
-
-- **Python 3.10+**
-- **Windows**: Install [Npcap](https://npcap.com/) with **"Install Npcap in WinPcap API-compatible Mode"** enabled. (Run Streamlit from an Administrator terminal if your user group requires raw-socket privileges).
-- **Linux / macOS**: Ensure `libpcap` is installed (`sudo apt-get install libpcap-dev` on Debian/Ubuntu).
-
-### 2. Installation
-
-Clone the repository and install the dependencies:
+Run from the repository root:
 
 ```powershell
-git clone https://github.com/hackerjose25/NetSense.git
-cd NetSense
 pip install -r requirements.txt
+npm --prefix frontend ci
+npm --prefix frontend run build
+python run.py
 ```
 
-### 3. Launch the Application
+Open **http://127.0.0.1:8000**. FastAPI serves the built frontend and API together; Node is only needed to install/build or develop the frontend. The lockfile pins frontend dependencies, and Vite 6 supports the project's existing Node 20.18 environment.
+
+After changing frontend code, rebuild it and refresh the browser. Stop the server with Ctrl+C. If Npcap restricts capture to administrators, run the backend from an Administrator terminal.
+
+## What changed from Streamlit
+
+- Filters, tabs, pagination, and connection drill-down execute in the browser without Python page reruns.
+- A WebSocket delivers capture snapshots once per second. Unchanged packet windows are omitted, and React reuses their existing data instead of reaggregating them.
+- Tables render 50 rows per page. All matching retained rows are included in CSV exports.
+- Packet capture runs independently of the UI. Optional PyTorch inference loads only when requested and executes outside the API event loop.
+- Disconnects are visible, current rates become unavailable, and the frontend reconnects automatically. Inputs remain mounted during live updates.
+- Saved sessions use the existing `data/sessions.sqlite3` database; no migration is needed.
+
+This is a local, single-user application. Browser tabs share one capture and library. Run **one backend worker**. The default server binds only to loopback; this application is not configured for public hosting or multiple users. The Python backend observes traffic visible to the adapter of the computer running it, not the computer visiting a remotely hosted page.
+
+## Using the dashboard
+
+1. Select a network adapter and click **Start capture**. Starting a new capture clears the previous in-memory capture.
+2. **Overview** shows full-session counters, the last 60 observed seconds, protocol distribution, and the top retained endpoints.
+3. **Traffic explorer** combines protocol, IP/CIDR, port, and time-window filters. Use **Connections**, **Top talkers**, or **Packets**. Arrow buttons open a connection's packets or filter to an IP. Clear filters to return to the full retained window.
+4. **Export CSV** downloads all matching rows for the current investigation tab, including rows beyond the current page.
+5. **Save session** records the current capture. **Saved sessions** opens historical snapshots and offers explicit deletion. Stop capture separately if you do not want it to continue while reviewing history.
+6. **Model analysis** runs an optional, one-time estimate when matching trained weights and `scaler.pkl` are present.
+
+## Measurement and storage boundaries
+
+- Session counters include all observed IP packets. Investigation and packet exports cover the latest **2,000 retained headers**.
+- Connections group protocol and bidirectional endpoint pairs. Duration spans matching retained packets; it is not a measured TCP connection lifetime. Reused endpoint pairs are grouped together.
+- IP and port filters match either endpoint. Time windows end at the latest retained packet. Packet timestamps and saved-session times are displayed in UTC.
+- Top-talker sent/received bytes are relative to each IP. Adding endpoint totals counts each packet twice.
+- Rates average up to five complete observed one-second intervals, including idle intervals. Throughput is visible traffic, not internet plan speed. Loss, congestion window, and timeouts are not measured.
+- Saved snapshots include session totals, up to 2,000 headers, and up to 60 seconds of chart history. They do not contain packet payloads or a complete PCAP. Historical snapshots do not show current rates.
+- The local SQLite library allows **50 sessions**, at most **5 MB** each, and never automatically deletes an older session. It is excluded from Git. Anyone with access to this local app instance can access that library.
+- Abandoned capture stops after roughly 60 seconds without an active consumer. Closing the backend also stops capture.
+- AI labels remain estimates derived from packet-size features. They do not establish congestion, application identity, packet loss, or malicious activity. The existing training methodology has not been changed by this frontend migration.
+
+## Frontend development
+
+Use two terminals in the repository root:
 
 ```powershell
-streamlit run app.py
+# Terminal 1: backend
+python -m uvicorn api:app --host 127.0.0.1 --port 8000
+
+# Terminal 2: frontend with hot reload
+npm --prefix frontend run dev
 ```
 
-Open your browser at **`http://localhost:8501`**.
+Open http://127.0.0.1:5173. Vite proxies `/api` and WebSocket traffic to the backend. Default local origins on ports 8000 and 5173 are accepted; unrelated browser origins are rejected. API documentation is available at http://127.0.0.1:8000/docs.
 
----
-
-## 🖥️ Using the Console
-
-1. Click **Open console ↗** in the navigation bar to jump directly to the live monitoring center.
-2. Select your active network adapter (e.g., Wi-Fi, Ethernet, or Virtual Adapter) from the dropdown.
-3. Click **Start Live Capture** to initiate a clean, synchronized sniffing session.
-4. Monitor live bandwidth, packets per second, and protocol distributions in real time.
-5. Inspect individual packet headers under the **Packet explorer** tab or click **Export CSV snapshot** to download session data.
-6. Click **Stop Capture** to safely release the adapter and preserve your capture snapshot.
-
----
-
-## 🧪 Verification & Testing
-
-NetSense includes a full suite of automated unit tests covering packet preprocessing, sequence construction, model inference, and UI state integrity:
+## Verification
 
 ```powershell
-python -m unittest test_live_capture test_netsense -q
+python -m unittest discover -s backend/tests -p "test_*.py" -v
+npm --prefix frontend test
+npm --prefix frontend run build
 ```
 
----
+Browser checks require Playwright, Microsoft Edge, and the built app running on port 8000:
 
-## 📁 Repository Structure
+```powershell
+python scripts/check_react_ui.py
+# Optional: also exercise real adapter capture and save via the UI
+python scripts/check_react_ui.py --live
+```
+
+The browser check uses the bundled PCAP as a clearly identified temporary saved session and deletes only its own test sessions afterwards. It checks the real API/WebSocket connection, filtering, connection drill-down, CSV download, input focus during updates, mobile layout, and deletion.
+
+## Project structure
 
 ```text
-NetSense/
-├── app.py                # Main application entry point & ML model inference
-├── ui.py                 # Bequant-inspired hero, navigation, and team components
-├── live_capture.py       # Thread-safe packet capture engine & interval metrics
-├── live_dashboard.py     # Live telemetry visualization, charts & packet table
-├── train.py              # PyTorch model training pipeline for LSTM classifier
-├── test_netsense.py      # Core unit tests for model, preprocessing & UI guards
-├── test_live_capture.py  # Synchronized packet capture unit tests
-├── requirements.txt      # Python dependencies
-├── LICENSE               # MIT License
-├── static/
-│   ├── netsense.css      # Custom styling, glassmorphic effects & design tokens
-│   └── hero-network.mp4  # Local high-definition telemetry hero video
-└── images/
-    ├── jose.jpg          # Jose Regish J profile avatar
-    └── gayathri.jpg      # Gayathri M profile avatar
+├── backend/
+│   ├── src/netsense/
+│   │   ├── api.py            FastAPI routes, WebSocket streaming, and React hosting
+│   │   ├── config.py         Centralized paths and runtime configuration
+│   │   ├── services/
+│   │   │   ├── capture.py    Thread-safe Scapy packet capture & rate measurement
+│   │   │   └── sessions.py   Bounded SQLite persistence for saved session snapshots
+│   │   └── ml/
+│   │       ├── inference.py  PyTorch model inference and feature preprocessing
+│   │       ├── model.py      PyTorch LSTM neural network architecture
+│   │       └── train.py      LSTM training pipeline with evaluation metrics
+│   ├── tests/
+│   │   ├── fixtures/         Test packet captures (sample_capture.pcap)
+│   │   ├── test_api.py       FastAPI route and WebSocket endpoint tests
+│   │   ├── test_capture.py   Live packet capture and metric calculation tests
+│   │   ├── test_inference.py ML inference and sequence preprocessing tests
+│   │   └── test_sessions.py  SQLite session store persistence tests
+│   └── pyproject.toml        Backend package definition and dependency metadata
+├── frontend/
+│   ├── src/
+│   │   ├── App.tsx           Main dashboard, capture telemetry, and session drawer
+│   │   ├── components/
+│   │   │   ├── Investigation.tsx Traffic explorer, IP/port filtering, and CSV export
+│   │   │   └── TrafficChart.tsx  Real-time SVG packet/throughput rate chart
+│   │   ├── hooks/
+│   │   │   └── useLiveCapture.ts WebSocket connection hook with auto-reconnect
+│   │   ├── lib/
+│   │   │   ├── api.ts        REST client and WebSocket stream manager
+│   │   │   └── analysis.ts   Client-side flow grouping and top talker rankings
+│   │   ├── styles/
+│   │   │   └── dashboard.css Responsive dark-mode dashboard styling
+│   │   └── types.ts          Shared TypeScript data interfaces
+│   ├── package.json          Frontend dependencies and build scripts
+│   └── vite.config.ts        Vite build configuration with local API proxy
+├── data/
+│   ├── samples/              Sample packet captures & CSV traffic data
+│   ├── training/             Dataset for model training (output1.csv)
+│   └── sessions.sqlite3      Local capture session database (git-ignored)
+├── models/
+│   └── tcp_udp_lstm_pytorch.pt Pre-trained PyTorch LSTM weights
+├── docs/
+│   └── screenshots/          Application UI screenshots (overview, live, explorer, mobile)
+├── images/                   Project contributor profile pictures
+├── scripts/
+│   └── check_react_ui.py     End-to-end browser verification script
+├── run.py                    Unified launcher for backend & React UI
+└── requirements.txt          Python project dependencies (-e ./backend)
 ```
 
 ---
+
 
 ## 👥 Built By
 
