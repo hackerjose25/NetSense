@@ -8,6 +8,9 @@ import torch
 from netsense.config import MODELS_DIR
 from netsense.ml.model import LSTMClassifier
 
+FEATURES = ['packet_count', 'avg_size', 'size_variation', 'packet_rate', 'rate_change']
+BUNDLE_NAME = "packet-size-v1"
+
 # ─────────────────────────────────────────
 # HELPER FUNCTIONS
 # ─────────────────────────────────────────
@@ -37,23 +40,24 @@ def preprocess(df):
 
 
 def make_sequences(df, timesteps=10):
-    features = ['packet_count', 'avg_size', 'size_variation', 'packet_rate', 'rate_change']
+    features = FEATURES
     data = df[features].values
     X = []
-    for i in range(len(data) - timesteps):
+    for i in range(len(data) - timesteps + 1):
         X.append(data[i:i + timesteps])
-    return np.array(X), features
+    return np.asarray(X, dtype=np.float32).reshape(-1, timesteps, len(features)), features
 
 
 @lru_cache(maxsize=4)
-def load_scaler():
+def load_scaler(path=None):
     import joblib
-    if not (MODELS_DIR / "scaler.pkl").is_file():
+    path = path or MODELS_DIR / BUNDLE_NAME / "scaler.pkl"
+    if not path.is_file():
         raise FileNotFoundError("Matching training scaler.pkl is missing; AI estimates are unavailable.")
-    return joblib.load(MODELS_DIR / "scaler.pkl")
+    return joblib.load(path)
 
-def predict(model, X_seq):
-    scaler = load_scaler()
+def predict(model, X_seq, scaler=None):
+    scaler = scaler if scaler is not None else load_scaler()
     nsamples, ntimesteps, nfeatures = X_seq.shape
     
     X_scaled = scaler.transform(X_seq.reshape(-1, nfeatures)).reshape(nsamples, ntimesteps, nfeatures)

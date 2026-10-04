@@ -1,0 +1,85 @@
+/* Shared product rhythm and accessible navigation. */
+:root { --radius-card: 16px; }
+.skip-link { position: fixed; top: 8px; left: 8px; z-index: 1000; padding: 12px 18px; background: #fff; color: #171b23; border-radius: 8px; transform: translateY(-160%); }
+.skip-link:focus { transform: translateY(0); }
+.landing-container section { scroll-margin-top: 88px; }
+.landing-nav-links a { color: #b8c0d0; padding: 10px 0; }
+.landing-nav-links a:hover { color: #ff999f; }
+.landing-container :is(.landing-cta-btn, .hero-primary-btn, .banner-cta-btn) { border-radius: 9px; font-weight: 600; }
+.landing-container .hero-eyebrow { border-style: solid; border-color: #ffffff24; border-radius: 100px; font-size: 10px; letter-spacing: 1px; }
+.landing-container .hero-title { font-weight: 500; letter-spacing: -.055em; }
+.landing-container .hero-subtitle { color: #d0d6e2; line-height: 1.8; }
+.landing-container .section-heading { font-weight: 450; line-height: 1.14; }
+.landing-container .section-index { color: #b398a0; font-size: 10px; line-height: 1.7; }
+.landing-container .section-intro { color: #b1bacb; }
+.landing-container .platform-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.landing-container :is(.platform-card, .team-card) { border-radius: var(--radius-card); border-color: #ffffff14; background: linear-gradient(135deg, #ffffff05, transparent), #10141c; }
+.landing-container .platform-card { padding: 28px; }
+.landing-container .platform-card h3 { font-size: 21px; letter-spacing: -.5px; }
+.landing-container :is(.platform-card p, .team-bio) { color: #abb6c9; font-size: 14px; line-height: 1.75; }
+.landing-container .platform-tag { font-size: 10px; letter-spacing: 1px; }
+.landing-container .platform-banner { border-radius: 14px; background: linear-gradient(110deg, #ff68680f, #111721); }
+.landing-container .team-card { padding: 30px 24px; }
+.landing-container .team-bio { text-align: left; }
+.landing-container .team-role { color: #b5bdcf; font-size: 10px; }
+.landing-container .team-linkedin-btn { min-height: 40px; border-radius: 7px; }
+.landing-workflow { padding: 96px 48px; display: grid; grid-template-columns: 180px minmax(0,1fr); gap: 40px; max-width: 1360px; margin: auto; border-top: 1px solid #ffffff14; background: #0b0d12; }
+.workflow-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 26px; padding: 0; margin: 0; list-style: none; }
+.workflow-grid li { border-top: 1px solid #ff858540; padding-top: 24px; }
+.step-number { font: 12px var(--mono); color: #ff8585; }
+.workflow-grid h3 { font-size: 18px; font-weight: 550; margin: 16px 0 12px; }
+.workflow-grid p { font-size: 14px; color: #abb6c9; line-height: 1.8; }
+.workflow-note { display: flex; align-items: flex-start; gap: 10px; color: #aeb8c8; background: #ffffff04; padding: 16px; margin-top: 32px; border-radius: 8px; font-size: 12px; line-height: 1.7; }
+.workflow-note svg { margin-top: 2px; color: #ff999f; }
+.app-shell main { max-width: 1600px; margin: 0 auto; }
+.app-shell .page-heading { border-color: #ffffff10; }
+.app-shell .page-heading h1 { font-weight: 600; letter-spacing: -1px; }
+.app-shell :is(.panel-heading h2, .metric-value) { font-weight: 550; }
+.app-shell :is(.metric, .panel, .capture-bar) { border-radius: var(--radius-card); }
+.app-shell .metric-label { font-size: 12px; }
+.app-shell :is(.metric p, .panel-heading p, .panel-foot) { font-size: 11px; line-height: 1.6; }
+.app-shell .nav-item { min-height: 44px; border-radius: 9px; }
+.app-shell :is(.button, .icon-button, input, select) { min-height: 36px; }
+.app-shell .button.primary { font-weight: 600; }
+.app-shell .filters-panel + .micro { color: #d0d9e8; background: #080d17e0; border-radius: 8px; padding: 12px 16px; line-height: 1.6; }
+.app-shell .empty { padding: 44px 24px; }
+.app-shell .empty p { max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+.app-shell th { font-size: 10px; letter-spacing: .6px; }
+@media (max-width:1050px) {
+  .landing-workflow { grid-template-columns: 1fr; gap: 20px; padding: 64px 24px; }
+}
+@media (max-width:768px) {
+  .landing-container .landing-nav { height: 104px; flex-wrap: wrap; padding: 10px 20px; align-content: space-between; }
+  .landing-container .landing-nav-links { display: flex; order: 3; width: 100%; justify-content: space-between; gap: 12px; }
+  .landing-container .landing-nav-links a { padding: 6px 0; font-size: 12px; }
+  .landing-container .connection-pill { display: none; }
+  .landing-container .landing-hero { padding-top: 120px; }
+  .landing-container section { scroll-margin-top: 120px; }
+  .landing-container .hero-content { margin-top: 38px; }
+  .landing-container .platform-grid, .workflow-grid { grid-template-columns: 1fr; }
+  .landing-container :is(.platform-card, .team-card) { padding: 24px; }
+  .app-shell .sidebar nav { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 4px; }
+  .app-shell .nav-item { flex-direction: column; justify-content: center; gap: 6px; padding: 9px 2px; }
+  .app-shell .nav-item:nth-child(4) > span { display: inline; }
+  .app-shell .nav-item > span:not(.nav-count) { font-size: 9px; white-space: nowrap; }
+  .app-shell .nav-count { display: none; }
+  .app-shell .console-motion { top: 188px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-container .platform-card:hover { transform: none; }
+}
+
+/* A single compact footer and quieter page framing. */
+.site-footer { max-width: 1264px; margin: 0 auto; padding: 28px 32px; border-top: 1px solid #ffffff14; display: flex; align-items: center; justify-content: space-between; gap: 24px; color: #aeb8c8; font-size: 12px; }
+.site-footer .landing-brand { font-size: 18px; }
+.site-footer .project-logo { width: 32px; height: 32px; }
+.site-footer .footer-back-top { display: inline-flex; align-items: center; gap: 8px; }
+.landing-container :is(.landing-platform, .landing-team, .landing-workflow) { grid-template-columns: minmax(0,1fr); max-width: 1200px; }
+.landing-container :is(.platform-container, .team-container) { width: 100%; max-width: none; }
+.app-shell .sidebar nav { margin-top: 36px; }
+.app-shell main { padding-bottom: 36px; }
+@media (max-width:768px) {
+  .app-shell .sidebar nav { margin-top: 0; }
+  .site-footer { padding: 24px; gap: 18px; flex-wrap: wrap; }
+  .site-footer .landing-brand { flex-basis: 100%; }
+}

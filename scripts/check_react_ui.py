@@ -41,7 +41,7 @@ try:
         if enter_btn.is_visible():
             page.screenshot(path=str(ROOT / 'test-results/react-landing.png'), full_page=True)
             enter_btn.click()
-        expect(page.get_by_text('Connected to capture service', exact=True)).to_be_visible()
+        expect(page.locator('.app-shell')).to_be_visible()
         expect(page.get_by_label('Network adapter')).not_to_contain_text('Finding network adapters', timeout=20000)
         page.screenshot(path=str(ROOT / 'test-results/react-overview.png'), full_page=True)
         page.get_by_role('button', name='Saved sessions').click()
@@ -49,6 +49,28 @@ try:
         expect(row).to_be_visible()
         row.get_by_role('button', name='Open', exact=True).click()
         expect(page.get_by_text('Saved snapshot', exact=True)).to_be_visible()
+        page.get_by_role('button', name='Model analysis', exact=True).click()
+        expect(page.get_by_role('button', name='Analyze capture', exact=True)).to_be_enabled()
+        page.get_by_role('button', name='Analyze capture', exact=True).click()
+        expect(page.get_by_role('heading', name='Analysis results', exact=True)).to_be_visible(timeout=20000)
+        expect(page.get_by_role('heading', name='Window-by-window results', exact=True)).to_be_visible()
+        with page.expect_download() as report_event:
+            page.get_by_role('button', name='Download report', exact=True).click()
+        import json
+        report = json.loads(Path(report_event.value.path()).read_text(encoding='utf-8'))
+        assert report['retained_packets'] == len(packets)
+        assert sum(report['distribution'].values()) == report['windows_analyzed']
+        assert abs(sum(report['probabilities'].values()) - 1) < 0.00001
+        page.screenshot(path=str(ROOT / 'test-results/react-model-analysis.png'), full_page=True)
+        page.set_viewport_size({'width': 390, 'height': 844})
+        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+        page.screenshot(path=str(ROOT / 'test-results/react-model-mobile.png'), full_page=True)
+        page.set_viewport_size({'width': 1440, 'height': 1100})
+        page.get_by_label('Capture to analyze').select_option('live')
+        expect(page.get_by_role('heading', name='Analysis results', exact=True)).to_have_count(0)
+        page.get_by_label('Capture to analyze').select_option(session_id)
+        expect(page.get_by_role('button', name='Analyze capture', exact=True)).to_be_enabled()
+        print('PASS matched model, saved-source selection, analysis results, report download and mobile layout', flush=True)
         page.get_by_role('button', name='Traffic explorer', exact=True).click()
         expect(page.get_by_role('table')).to_be_visible()
         expect(page.get_by_role('row')).to_have_count(3)

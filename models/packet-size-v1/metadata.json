@@ -1,0 +1,66 @@
+{
+  "version": "packet-size-v1",
+  "trained_at": "2026-10-04T08:18:32.011158+00:00",
+  "features": [
+    "packet_count",
+    "avg_size",
+    "size_variation",
+    "packet_rate",
+    "rate_change"
+  ],
+  "timesteps": 10,
+  "labels": [
+    "Low Traffic",
+    "Medium Traffic",
+    "High Traffic"
+  ],
+  "label_definition": "Low/Medium/High classes derived from training-only quantiles of the sum of two consecutive packet lengths. Not a congestion or threat label.",
+  "thresholds": [
+    1520.0,
+    2924.0
+  ],
+  "dataset_sha256": "1c56b3a7dec839ec37e6b460f09abe9099d5c75b220eb06a70101521c76a47a0",
+  "weights_sha256": "022abad101dbac3ba108633e9eb00b220879529a00fc7e1601cd0160e48580bf",
+  "scaler_sha256": "bf85077f03fe34ed4ecd372dca9dda61f86ac900d0d51ca300bb3121f44b330b",
+  "dataset_rows": 394136,
+  "training_windows": 24000,
+  "validation_windows": 6000,
+  "test_windows": 6000,
+  "split": "Chronological 70/15/15, disjoint packet rows; scaler and label thresholds fitted on training only.",
+  "accuracy": 0.872,
+  "macro_f1": 0.8672431700328599,
+  "classification_report": {
+    "Low Traffic": {
+      "precision": 0.9771371769383698,
+      "recall": 0.7227941176470588,
+      "f1-score": 0.830938292476754,
+      "support": 1360.0
+    },
+    "Medium Traffic": {
+      "precision": 0.8517699115044248,
+      "recall": 0.8632286995515696,
+      "f1-score": 0.8574610244988864,
+      "support": 2676.0
+    },
+    "High Traffic": {
+      "precision": 0.8496932515337423,
+      "recall": 0.9872708757637475,
+      "f1-score": 0.9133301931229393,
+      "support": 1964.0
+    },
+    "accuracy": 0.872,
+    "macro avg": {
+      "precision": 0.892866779992179,
+      "recall": 0.857764564320792,
+      "f1-score": 0.8672431700328599,
+      "support": 6000.0
+    },
+    "weighted avg": {
+      "precision": 0.879506731639049,
+      "recall": 0.872,
+      "f1-score": 0.8697370464368097,
+      "support": 6000.0
+    }
+  },
+  "limitation": "Evaluation uses derived labels from one capture dataset. Results have not been validated across independent networks."
+}

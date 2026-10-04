@@ -1,6 +1,8 @@
-import React, { useRef, useState } from "react";
+import projectLogo from "../assets/netsense-logo.png";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Activity,
+  BrainCircuit,
   ArrowDown,
   ArrowUpRight,
   ExternalLink,
@@ -18,48 +20,50 @@ import gayathriAvatar from "../assets/gayathri.jpg";
 
 interface LandingPageProps {
   onEnterConsole: () => void;
-  connected: boolean;
 }
 
-export default function LandingPage({ onEnterConsole, connected }: LandingPageProps) {
-  const [isPlaying, setIsPlaying] = useState(true);
+export default function LandingPage({ onEnterConsole }: LandingPageProps) {
+  const [isPlaying, setIsPlaying] = useState(() => !window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const toggleVideo = () => {
-    if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      void videoRef.current.play();
-      setIsPlaying(true);
-    }
-  };
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const change = () => setIsPlaying(!preference.matches);
+    preference.addEventListener("change", change);
+    return () => preference.removeEventListener("change", change);
+  }, []);
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const sync = () => {
+      if (!isPlaying || document.hidden) video.pause();
+      else void video.play().catch(() => setIsPlaying(false));
+    };
+    sync();
+    document.addEventListener("visibilitychange", sync);
+    return () => document.removeEventListener("visibilitychange", sync);
+  }, [isPlaying]);
+  const toggleVideo = () => setIsPlaying((playing) => !playing);
 
   return (
     <div className="landing-container">
+      <a className="skip-link" href="#home">Skip to content</a>
       {/* ─── Top Navigation Bar ─── */}
       <header className="landing-nav" aria-label="Landing navigation">
         <a href="#home" className="landing-brand">
-          <span className="brand-mark">
-            <Activity size={22} strokeWidth={2.5} />
-          </span>
+          <img className="brand-mark project-logo" src={projectLogo} alt="NetSense shield logo" />
           NetSense<span className="brand-dot">.</span>
         </a>
 
         <nav className="landing-nav-links" aria-label="Sections">
           <a href="#home">Home</a>
           <a href="#platform">Platform</a>
-          <a href="#team">Built by</a>
+          <a href="#workflow">How it works</a>
+          <a href="#team">The team</a>
         </nav>
 
         <div className="landing-nav-actions">
-          <div className="connection-pill" title={connected ? "Connected to capture service" : "Capture service offline"}>
-            <span className={`pulse-dot ${connected ? "live" : ""}`} />
-            <span>{connected ? "Engine ready" : "Local engine"}</span>
-          </div>
-
-          <button
+<button
             type="button"
             className="landing-cta-btn"
             onClick={onEnterConsole}
@@ -72,12 +76,12 @@ export default function LandingPage({ onEnterConsole, connected }: LandingPagePr
       </header>
 
       {/* ─── Hero Section with Video Background ─── */}
-      <section id="home" className="landing-hero" aria-label="NetSense network monitoring">
+      <section id="home" tabIndex={-1} className="landing-hero" aria-label="NetSense network monitoring">
         <div className="hero-video-wrapper">
           <video
             ref={videoRef}
             className="hero-video"
-            autoPlay
+            autoPlay={isPlaying}
             muted
             loop
             playsInline
@@ -90,12 +94,7 @@ export default function LandingPage({ onEnterConsole, connected }: LandingPagePr
         </div>
 
         <div className="hero-content">
-          <div className="hero-eyebrow">
-            <span className="sparkle" aria-hidden="true">✳</span>
-            <span>PACKET-LEVEL NETWORK VISIBILITY</span>
-          </div>
-
-          <h1 className="hero-title">
+<h1 className="hero-title">
             Understand<br />your network.
           </h1>
 
@@ -137,7 +136,6 @@ export default function LandingPage({ onEnterConsole, connected }: LandingPagePr
 
         {/* Hero Bottom Fact Bar */}
         <div className="hero-bottom-bar">
-          <div className="hero-overline">BUILT FOR A CONNECTED WORLD</div>
           <div className="hero-facts-grid">
             <div className="fact-item">
               <strong>TCP / UDP</strong>
@@ -152,8 +150,8 @@ export default function LandingPage({ onEnterConsole, connected }: LandingPagePr
               <small>Local monitoring</small>
             </div>
             <div className="fact-item">
-              <strong>100% Private</strong>
-              <small>Zero cloud telemetry</small>
+              <strong>Local-first</strong>
+              <small>Capture stays local</small>
             </div>
           </div>
         </div>
@@ -161,13 +159,12 @@ export default function LandingPage({ onEnterConsole, connected }: LandingPagePr
 
       {/* ─── Platform Features Section ─── */}
       <section id="platform" className="landing-platform" aria-label="Platform features">
-        <div className="section-index">02 / THE PLATFORM</div>
         <div className="platform-container">
           <h2 className="section-heading">
             Visibility starts<br />with real data.
           </h2>
           <p className="section-intro">
-            From the first packet to the bigger picture. Know exactly what your network is doing.
+            Capture live traffic, investigate connections, and explore model estimates in one focused workspace.
           </p>
 
           <div className="platform-grid">
@@ -206,6 +203,12 @@ export default function LandingPage({ onEnterConsole, connected }: LandingPagePr
                 flows or export records into standard CSV files.
               </p>
             </article>
+            <article className="platform-card">
+              <div className="platform-icon-wrap"><BrainCircuit size={24} /></div>
+              <span className="platform-tag">MODEL ANALYSIS</span>
+              <h3>Find patterns in the packets.</h3>
+              <p>Explore packet-size classifications across a capture, compare window results, and download a report with the model's evaluation context.</p>
+            </article>
           </div>
 
           {/* Quick Launch Banner */}
@@ -227,8 +230,20 @@ export default function LandingPage({ onEnterConsole, connected }: LandingPagePr
       </section>
 
       {/* ─── Team Section ─── */}
+      <section id="workflow" className="landing-workflow" aria-labelledby="workflow-title">
+        <div>
+          <h2 id="workflow-title" className="section-heading">From traffic to insight.<br />Three simple steps.</h2>
+          <p className="section-intro">A practical workflow for a live demo or a closer look at your own network.</p>
+          <ol className="workflow-grid">
+            <li><span className="step-number">01</span><h3>Choose &amp; capture</h3><p>Open the console, choose a network adapter, and start collecting real packets.</p></li>
+            <li><span className="step-number">02</span><h3>Follow the activity</h3><p>Watch traffic rates, filter connections, and identify the endpoints sending the most data.</p></li>
+            <li><span className="step-number">03</span><h3>Save &amp; analyze</h3><p>Save a session, run model analysis on at least 10 packets, and export your findings.</p></li>
+          </ol>
+          <p className="workflow-note"><ShieldCheck size={16} /> Model results describe packet-size patterns. Congestion and threat detection are outside the current model's scope.</p>
+        </div>
+      </section>
+
       <section id="team" className="landing-team" aria-label="NetSense creators">
-        <div className="section-index">03 / BUILT BY</div>
         <div className="team-container">
           <h2 className="section-heading">Built by engineers.</h2>
           <p className="section-intro">
@@ -298,31 +313,19 @@ export default function LandingPage({ onEnterConsole, connected }: LandingPagePr
               <p className="team-bio">
                 Researched the project concept and problem space, and contributed to frontend interface development and styling.
               </p>
-              <div className="team-badge">
-                <span>Frontend Contributor</span>
-              </div>
             </article>
           </div>
         </div>
       </section>
 
       {/* ─── Footer ─── */}
-      <footer className="landing-footer">
-        <div className="footer-top">
-          <a href="#home" className="landing-brand">
-            <span className="brand-mark">
-              <Activity size={18} strokeWidth={2.5} />
-            </span>
-            NetSense<span className="brand-dot">.</span>
-          </a>
-          <span className="footer-slogan">Network visibility. Without the guesswork.</span>
-          <a href="#home" className="footer-back-top">Back to top ↑</a>
-        </div>
-        <div className="footer-bottom">
-          <span>&copy; 2026 NetSense Platform</span>
-          <span>Engineered by Jose, Gayathri M &amp; Dharshini M</span>
-          <span>Real-Time Packet Telemetry</span>
-        </div>
+      <footer className="site-footer">
+        <a href="#home" className="landing-brand">
+          <img className="brand-mark project-logo" src={projectLogo} alt="NetSense shield logo" />
+          NetSense<span className="brand-dot">.</span>
+        </a>
+        <span>&copy; {new Date().getFullYear()} NetSense</span>
+        <a href="#home" className="footer-back-top">Back to top <ArrowUpRight size={14} /></a>
       </footer>
     </div>
   );

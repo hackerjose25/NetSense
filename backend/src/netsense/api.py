@@ -177,27 +177,21 @@ def create_app(service=None, store=None):
 
     @app.get("/api/model")
     def model_status():
-        available = (MODELS_DIR / "tcp_udp_lstm_pytorch.pt").is_file() and (MODELS_DIR / "scaler.pkl").is_file()
-        return {"available": available, "detail": "Estimates use packet-size features, not measured congestion or packet loss."
-                if available else "AI estimates need trained weights and the matching scaler.pkl. Live analysis works independently."}
+        from netsense.ml.analysis import model_status as status
+        return status(MODELS_DIR)
 
     @app.post("/api/model/predict")
     def model_predict(body: AnalysisRequest):
         if not model_status()["available"]:
             raise HTTPException(503, model_status()["detail"])
         snapshot = load_session(body.session_id) if body.session_id else service.snapshot()
-        if len(snapshot["packets"]) <= 10:
-            raise HTTPException(400, "At least 11 retained packets are needed for an estimate.")
         try:
-            import pandas as pd
-            from netsense.ml.inference import LABEL_NAMES, load_model, make_sequences, predict, preprocess
-            sequences, _ = make_sequences(preprocess(pd.DataFrame(snapshot["packets"][-11:])))
-            predictions, probabilities = predict(load_model(str(MODELS_DIR / "tcp_udp_lstm_pytorch.pt")), sequences)
-            return {"label": LABEL_NAMES[int(predictions[-1])],
-                    "probabilities": {LABEL_NAMES[i]: float(value) for i, value in enumerate(probabilities[-1])},
-                    "packet_count": snapshot["packet_count"]}
-        except Exception as exc:
-            raise HTTPException(503, "Model inference failed. Check that the weights and scaler match the trained model.") from exc
+            from netsense.ml.analysis import analyze
+            return analyze(snapshot, MODELS_DIR)
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        except (RuntimeError, ImportError) as exc:
+            raise HTTPException(503, str(exc)) from exc
 
     dist = FRONTEND_DIST
     if dist.is_dir():

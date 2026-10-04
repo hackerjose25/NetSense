@@ -1,3 +1,5 @@
+import ConsoleBackground from "./components/ConsoleBackground";
+import projectLogo from "./assets/netsense-logo.png";
 import { useEffect, useMemo, useState } from "react";
 import {
   Activity,
@@ -11,7 +13,6 @@ import {
   Clock3,
   Database,
   FolderClock,
-  Globe2,
   Layers,
   LoaderCircle,
   Network,
@@ -32,6 +33,7 @@ import type { Adapter, Session, Snapshot } from "./types";
 import Chart from "./components/TrafficChart";
 import Investigation from "./components/Investigation";
 import LandingPage from "./components/LandingPage";
+import ModelAnalysis from "./components/ModelAnalysis";
 
 type Page = "overview" | "investigate" | "sessions" | "model";
 const pageNames: Record<Page, string> = {
@@ -68,7 +70,11 @@ export default function App() {
   const [view, setView] = useState<"landing" | "dashboard">(() => {
     if (typeof window !== "undefined") {
       const hash = window.location.hash.toLowerCase();
-      if (hash === "#console" || hash === "#dashboard" || hash === "#monitoring") {
+      if (
+        hash === "#console" ||
+        hash === "#dashboard" ||
+        hash === "#monitoring"
+      ) {
         return "dashboard";
       }
     }
@@ -89,16 +95,6 @@ export default function App() {
   const [notice, setNotice] = useState("");
   const [dialog, setDialog] = useState<"save" | Session | null>(null);
   const [name, setName] = useState("");
-  const [model, setModel] = useState({
-    available: false,
-    detail: "Checking model artifacts…",
-  });
-  const [prediction, setPrediction] = useState<{
-    label: string;
-    probabilities: Record<string, number>;
-    packet_count: number;
-    scope: string;
-  } | null>(null);
   const snapshot = saved?.snapshot ?? live ?? empty;
   const active =
     !!live && ["starting", "running", "stopping"].includes(live.state);
@@ -136,18 +132,7 @@ export default function App() {
   useEffect(() => {
     void loadAdapters();
     void loadSessions();
-    request<typeof model>("/model")
-      .then(setModel)
-      .catch(() =>
-        setModel({
-          available: false,
-          detail: "Model status unavailable. Check the backend connection.",
-        }),
-      );
   }, [connected]);
-  useEffect(() => {
-    setPrediction(null);
-  }, [scope]);
   useEffect(() => {
     if (!dialog) return;
     const previous = document.activeElement as HTMLElement | null;
@@ -215,11 +200,13 @@ export default function App() {
   };
 
   if (view === "landing") {
-    return <LandingPage onEnterConsole={enterConsole} connected={connected} />;
+    return <LandingPage onEnterConsole={enterConsole} />;
   }
 
   return (
     <div className="app-shell">
+      <ConsoleBackground />
+      <a className="skip-link" href="#console-content">Skip to content</a>
       <aside className="sidebar">
         <a
           href="#"
@@ -230,12 +217,9 @@ export default function App() {
           }}
           title="Return to Landing Page"
         >
-          <span className="brand-mark">
-            <Activity size={23} strokeWidth={2.5} />
-          </span>
+          <img className="brand-mark project-logo" src={projectLogo} alt="NetSense shield logo" />
           NetSense<span className="brand-dot">.</span>
         </a>
-        <div className="workspace-label">NETWORK WORKSPACE</div>
         <nav aria-label="Main navigation">
           {nav.map(({ id, icon: Icon, label }) => (
             <button
@@ -256,23 +240,6 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <div className="sidebar-bottom">
-          <div className="local-card">
-            <ShieldCheck size={19} />
-            <div>
-              <strong>Local by design</strong>
-              <p>Your capture stays on this computer.</p>
-            </div>
-          </div>
-          <div className="workspace-user">
-            <span className="avatar">N</span>
-            <div>
-              <strong>Local workspace</strong>
-              <small>IPv4 + IPv6 capture</small>
-            </div>
-            <span className={`dot ${connected ? "green" : ""}`} />
-          </div>
-        </div>
       </aside>
       <div className="main-shell">
         <header className="topbar">
@@ -291,19 +258,10 @@ export default function App() {
               <strong>{pageNames[page]}</strong>
             </div>
           </div>
-          <div className="backend-status">
-            <span className={`dot ${connected ? "green" : ""}`} />
-            {connected
-              ? "Connected to capture service"
-              : "Connecting to capture service"}
-          </div>
         </header>
-        <main>
+        <main id="console-content" tabIndex={-1}>
           <div className="page-heading">
             <div>
-              <div className="eyebrow">
-                <span className="tiny-line" /> NETWORK INTELLIGENCE
-              </div>
               <h1>
                 {pageNames[page]}
                 <span>.</span>
@@ -317,9 +275,6 @@ export default function App() {
                       ? "Pick up where you left off. Your captured moments, kept locally."
                       : "Explore estimates from your trained traffic model."}
               </p>
-            </div>
-            <div className="heading-badge">
-              <Globe2 size={15} /> ON YOUR DEVICE
             </div>
           </div>
           {!connected && (
@@ -743,78 +698,22 @@ export default function App() {
             </section>
           )}
           {page === "model" && (
-            <section className="panel model-panel">
-              <div className="model-icon">
-                <BrainCircuit size={30} />
-              </div>
-              <div className="eyebrow">OPTIONAL ANALYSIS</div>
-              <h2>Traffic model estimates</h2>
-              <p>{model.detail}</p>
-              <p className="micro">
-                The current model predicts Low, Medium, or High Traffic from
-                packet-size sequences. These estimates do not establish
-                congestion, packet loss, or malicious activity.
-              </p>
-              <button
-                className="button primary"
-                disabled={
-                  !model.available ||
-                  !!busy ||
-                  snapshot.packets.length < 11 ||
-                  (!saved && !connected)
+            <ModelAnalysis
+              key={scope}
+              snapshot={snapshot}
+              sessionId={saved?.id ?? null}
+              sessions={sessions}
+              connected={connected}
+              onSelectSession={async (id) => {
+                if (!id) {
+                  setSaved(null);
+                  return;
                 }
-                onClick={() =>
-                  void action("predict", async () => {
-                    const result = await request<
-                      Omit<NonNullable<typeof prediction>, "scope">
-                    >("/model/predict", "POST", {
-                      session_id: saved?.id ?? null,
-                    });
-                    setPrediction({ ...result, scope });
-                  })
-                }
-              >
-                {busy === "predict" ? (
-                  <LoaderCircle className="spin" size={16} />
-                ) : (
-                  <BrainCircuit size={16} />
-                )}{" "}
-                Analyze latest packet window
-              </button>
-              {model.available && snapshot.packets.length < 11 && (
-                <p className="micro">
-                  At least 11 retained packets are needed.
-                </p>
-              )}
-              {prediction?.scope === scope && (
-                <div className="prediction">
-                  <h3>{prediction.label}</h3>
-                  <p className="micro">
-                    One-time estimate at{" "}
-                    {prediction.packet_count.toLocaleString()} captured packets.
-                    Run again to update.
-                  </p>
-                  {Object.entries(prediction.probabilities).map(
-                    ([label, probability]) => (
-                      <div className="probability" key={label}>
-                        <span>{label}</span>
-                        <progress value={probability} max={1} />
-                        <strong>{(probability * 100).toFixed(1)}%</strong>
-                      </div>
-                    ),
-                  )}
-                </div>
-              )}
-            </section>
+                const data = await request<Snapshot>(`/sessions/${id}`);
+                setSaved({ id, snapshot: data });
+              }}
+            />
           )}
-          <footer className="footer">
-            <span>
-              <span className="dot green" /> REAL PACKETS. LOCAL INSIGHT.
-            </span>
-            <span>
-              NetSense <span className="muted">/</span> Network intelligence
-            </span>
-          </footer>
         </main>
       </div>
       {dialog && (

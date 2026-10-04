@@ -1,0 +1,72 @@
+/* Console-only glass surfaces; the home page keeps its own visual treatment. */
+.app-shell {
+  isolation: isolate;
+  position: relative;
+  --line: rgba(255, 255, 255, .13);
+  --surface: rgba(14, 18, 26, .72);
+  --muted: #a8b0be;
+}
+.console-backdrop { position: fixed; inset: 0; z-index: -1; pointer-events: none; background-size: cover; background-position: center; background-color: #090b13; }
+.console-backdrop video { width: 100%; height: 100%; object-fit: cover; }
+.console-backdrop-shade { position: absolute; inset: 0; background: linear-gradient(120deg, rgba(5, 8, 16, .80), rgba(8, 10, 18, .72) 55%, rgba(6, 9, 15, .82)); }
+.app-shell .sidebar, .app-shell .topbar {
+  background: linear-gradient(135deg, rgba(35, 39, 52, .74), rgba(10, 13, 23, .82));
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 8px 32px rgba(0,0,0,.18);
+}
+.app-shell :is(.panel, .metric, .capture-bar, .local-card, .saved-banner, .notice, .modal) {
+  background: linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.015) 46%), rgba(10,15,24,.76);
+  border: 1px solid rgba(220,225,255,.16);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), inset 0 -1px 0 rgba(255,255,255,.025), 0 12px 34px rgba(0,0,0,.24);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.app-shell .metric { border-radius: 14px; }
+.app-shell :is(.panel, .capture-bar) { border-radius: 14px; }
+.app-shell :is(.button, .back-to-landing-btn) {
+  background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.025)), rgba(21,26,39,.84);
+  border-color: rgba(255,255,255,.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 3px 10px rgba(0,0,0,.16);
+}
+.app-shell .button.primary { background: linear-gradient(180deg, #ff9191, #f45260); color: #250b10; border-color: #ffadb3; box-shadow: inset 0 1px 0 #ffd0d0, 0 4px 18px #fa465c30; }
+.app-shell .button.danger { background: linear-gradient(180deg, #783747, #451c29); color: #ffced5; border-color: #bb6476; }
+.app-shell .nav-item.active { background: linear-gradient(135deg, #ff85852b, #ff68680c); border-color: #ff858547; box-shadow: inset 0 1px 0 #ffbaba24; }
+.app-shell :is(input, select) { background-color: rgba(7,12,22,.78); border-color: #ffffff29; }
+.app-shell :is(.metric p, .panel-heading p, .micro, .panel-foot) { color: #a2afbf; }
+.app-shell thead { background: rgba(13,18,29,.86); }
+.app-shell tbody tr:hover { background: rgba(255,255,255,.06); }
+.app-shell .notice.success { color: #ffc1c6; border-color: #ff858547; }
+.app-shell .notice.error { border-color: #ff8a685e; color: #ffc1b1; }
+.app-shell .notice.warning { border-color: #e7be6560; color: #e7cd99; }
+.app-shell .console-motion { position: absolute; top: 88px; right: 38px; z-index: 2; backdrop-filter: blur(12px); background-color: #101522ed; }
+
+@media (max-width: 700px) {
+  .app-shell :is(.panel, .metric, .capture-bar) { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .app-shell .console-motion { top: 176px; right: 16px; font-size: 10px; }
+}
+@media (max-width: 700px) { .console-motion span { display: none; } }
+@supports not (backdrop-filter: blur(1px)) {
+  .app-shell :is(.panel, .metric, .capture-bar, .sidebar, .topbar) { background-color: #101522f2; }
+}
+
+/* Stable contrast for text that sits directly over the moving footage. */
+.app-shell :is(.page-heading, .status-row, .scope-note, .footer, .model-result-heading) {
+  background: rgba(7, 11, 19, .82);
+  border: 1px solid rgba(223, 231, 255, .12);
+  border-radius: 10px;
+  padding: 14px 18px;
+  color: #d5deeb;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .8);
+}
+.app-shell .page-heading { padding: 20px; }
+.app-shell :is(.page-heading h1, .model-result-heading h2) { color: #f6f8ff; }
+.app-shell :is(.page-heading p, .model-result-heading p, .eyebrow, .heading-badge, .footer .muted) { color: #c8d3e3; }
+.app-shell .eyebrow { font-size: 10px; }
+.app-shell .status-row { font-size: 11px; }
+.app-shell .status-row .capture-status { font-size: 10px; }
+.app-shell .status-divider { color: #aab8cc; }
+.app-shell .heading-badge { background: #101725; }
+.app-shell .scope-note { line-height: 1.65; }
+@media (max-width: 700px) {
+  .app-shell :is(.page-heading, .status-row, .scope-note, .footer, .model-result-heading) { padding: 12px; }
+  .app-shell .page-heading { padding-top: 22px; }
+}

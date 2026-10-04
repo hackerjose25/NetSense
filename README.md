@@ -37,7 +37,23 @@ This is a local, single-user application. Browser tabs share one capture and lib
 3. **Traffic explorer** combines protocol, IP/CIDR, port, and time-window filters. Use **Connections**, **Top talkers**, or **Packets**. Arrow buttons open a connection's packets or filter to an IP. Clear filters to return to the full retained window.
 4. **Export CSV** downloads all matching rows for the current investigation tab, including rows beyond the current page.
 5. **Save session** records the current capture. **Saved sessions** opens historical snapshots and offers explicit deletion. Stop capture separately if you do not want it to continue while reviewing history.
-6. **Model analysis** runs an optional, one-time estimate when matching trained weights and `scaler.pkl` are present.
+6. **Model analysis** analyzes the retained capture or a selected saved session, shows class distributions and window-by-window results, and downloads a JSON report.
+
+## Model analysis
+
+The active, matched bundle is in `models/packet-size-v1/`: weights, `scaler.pkl`, and a training manifest containing file hashes and held-out evaluation. The original standalone weights are preserved. The API rejects missing or mismatched bundle files.
+
+Open **Model analysis**, choose the current capture or a saved session, then click **Analyze capture**. At least **10 retained IP packets** are required. Analysis evaluates up to 100 evenly spaced 10-packet windows across the retained buffer, reports their class counts and mean model probabilities, and offers a JSON report download. Results are snapshots; run again to update them.
+
+To reproduce the bundle from the included training dataset:
+
+```powershell
+python -m netsense.ml.train
+# Optional controls
+python -m netsense.ml.train --epochs 12 --max-samples 24000
+```
+
+Training creates both weights and scaler together. The validation set selects the checkpoint; the final test set is evaluated separately. The manifest records the dataset hash, split, thresholds, and evaluation counts. After retraining, click **Refresh model**; the API reloads changed artifacts. These classes describe packet-size patterns relative to the training dataset. Probabilities are uncalibrated, and cross-network performance has not been established.
 
 ## Measurement and storage boundaries
 
@@ -49,7 +65,7 @@ This is a local, single-user application. Browser tabs share one capture and lib
 - Saved snapshots include session totals, up to 2,000 headers, and up to 60 seconds of chart history. They do not contain packet payloads or a complete PCAP. Historical snapshots do not show current rates.
 - The local SQLite library allows **50 sessions**, at most **5 MB** each, and never automatically deletes an older session. It is excluded from Git. Anyone with access to this local app instance can access that library.
 - Abandoned capture stops after roughly 60 seconds without an active consumer. Closing the backend also stops capture.
-- AI labels remain estimates derived from packet-size features. They do not establish congestion, application identity, packet loss, or malicious activity. The existing training methodology has not been changed by this frontend migration.
+- AI labels remain estimates derived from packet-size features. They do not establish congestion, application identity, packet loss, or malicious activity. The active bundle is trained with a chronological 70/15/15 split before constructing sequences. Its labels are derived from training-only packet-size thresholds, so evaluation scores describe agreement with those labels, not independent congestion or threat detection.
 
 ## Frontend development
 
@@ -57,7 +73,7 @@ Use two terminals in the repository root:
 
 ```powershell
 # Terminal 1: backend
-python -m uvicorn api:app --host 127.0.0.1 --port 8000
+python -m uvicorn netsense.api:app --host 127.0.0.1 --port 8000
 
 # Terminal 2: frontend with hot reload
 npm --prefix frontend run dev

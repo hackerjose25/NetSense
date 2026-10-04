@@ -18,7 +18,7 @@ from netsense.config import MODELS_DIR
 class TestInference(unittest.TestCase):
 
     def setUp(self):
-        self.model_path = MODELS_DIR / "tcp_udp_lstm_pytorch.pt"
+        self.model_path = MODELS_DIR / "packet-size-v1" / "tcp_udp_lstm_pytorch.pt"
 
     def test_01_model_loading(self):
         """Test loading PyTorch model weights."""
@@ -49,13 +49,13 @@ class TestInference(unittest.TestCase):
         })
         proc_df = preprocess(raw_df)
         X_seq, features = make_sequences(proc_df, timesteps=10)
-        self.assertEqual(X_seq.shape, (15, 10, 5))
+        self.assertEqual(X_seq.shape, (16, 10, 5))
         self.assertEqual(len(features), 5)
 
     def test_04_model_inference(self):
         """Test end-to-end prediction and probability distribution."""
         model = load_model(self.model_path)
-        if not (MODELS_DIR / "scaler.pkl").is_file():
+        if not (MODELS_DIR / "packet-size-v1" / "scaler.pkl").is_file():
             with self.assertRaises(FileNotFoundError):
                 predict(model, np.ones((5, 10, 5)))
             return

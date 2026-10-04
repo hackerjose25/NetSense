@@ -70,8 +70,8 @@ export default function Chart({ history }: { history: Snapshot["history"] }) {
           >
             <defs>
               <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
-                <stop stopColor="#b8f36c" stopOpacity=".2" />
-                <stop offset="1" stopColor="#b8f36c" stopOpacity="0" />
+                <stop stopColor="var(--accent)" stopOpacity=".2" />
+                <stop offset="1" stopColor="var(--accent)" stopOpacity="0" />
               </linearGradient>
             </defs>
             {[0, 1, 2, 3].map((step) => (
@@ -95,12 +95,12 @@ export default function Chart({ history }: { history: Snapshot["history"] }) {
             <path
               d={line}
               fill="none"
-              stroke="#b8f36c"
+              stroke="var(--accent)"
               strokeWidth="2"
               vectorEffect="non-scaling-stroke"
             />
             {history.length === 1 && (
-              <circle cx={x(0)} cy={y(values[0])} r="3" fill="#b8f36c" />
+              <circle cx={x(0)} cy={y(values[0])} r="3" fill="var(--accent)" />
             )}
             <text x="54" y="236">
               {history[0]["Second since start"]}s
@@ -115,14 +115,14 @@ export default function Chart({ history }: { history: Snapshot["history"] }) {
                   x2={x(hover!)}
                   y1="20"
                   y2="210"
-                  stroke="#657260"
+                  stroke="#806269"
                   strokeDasharray="4"
                 />
                 <circle
                   cx={x(hover!)}
                   cy={y(values[hover!])}
                   r="4"
-                  fill="#b8f36c"
+                  fill="var(--accent)"
                 />
               </>
             )}
