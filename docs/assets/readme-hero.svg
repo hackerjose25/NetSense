@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-labelledby="title desc">
+  <title id="title">NetSense — Network Traffic Intelligence</title>
+  <desc id="desc">A dark navy banner with lime, cyan, and violet network paths. Capture live traffic, explore connections, and analyze packet-size patterns on your device.</desc>
+  <defs>
+    <linearGradient id="background" x2="1" y2="1">
+      <stop stop-color="#0d1726"/>
+      <stop offset="1" stop-color="#10192e"/>
+    </linearGradient>
+    <linearGradient id="accent">
+      <stop stop-color="#b8f36b"/>
+      <stop offset=".5" stop-color="#4dd9ee"/>
+      <stop offset="1" stop-color="#ae95ff"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#a1b4d9" stroke-opacity=".06"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="420" rx="24" fill="url(#background)"/>
+  <rect width="1280" height="420" rx="24" fill="url(#grid)"/>
+  <path d="M24 418H1256" stroke="url(#accent)" stroke-width="4"/>
+  <g font-family="Segoe UI, Arial, sans-serif">
+    <rect x="58" y="48" width="48" height="48" rx="14" fill="#b8f36b"/>
+    <path d="M68 72H76L81 58L88 86L94 72H99" fill="none" stroke="#14221a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="122" y="78" fill="#b8f36b" font-size="15" font-weight="600" letter-spacing="3">NETWORK TRAFFIC INTELLIGENCE</text>
+    <text x="54" y="191" fill="#f0f6fc" font-size="86" font-weight="750" letter-spacing="-4">NetSense<tspan fill="#b8f36b">.</tspan></text>
+    <text x="58" y="238" fill="#e0e9f7" font-size="27">See the traffic. Understand the patterns.</text>
+    <text x="58" y="277" fill="#9caec6" font-size="18">Live packet capture, connection exploration, and model analysis.</text>
+    <g font-size="14" font-weight="600">
+      <rect x="58" y="322" width="150" height="38" rx="19" fill="#1c3026" stroke="#385a39"/>
+      <circle cx="79" cy="341" r="4" fill="#b8f36b"/>
+      <text x="93" y="346" fill="#ccf8a0">LIVE CAPTURE</text>
+      <rect x="220" y="322" width="130" height="38" rx="19" fill="#152e3c" stroke="#245264"/>
+      <text x="243" y="346" fill="#83e6f2">IPv4 + IPv6</text>
+      <rect x="362" y="322" width="178" height="38" rx="19" fill="#28233e" stroke="#50406d"/>
+      <text x="385" y="346" fill="#cfbfff">ON YOUR DEVICE</text>
+    </g>
+  </g>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="1040" cy="207" r="147" stroke="#26364b" stroke-dasharray="4 12"/>
+    <circle cx="1040" cy="207" r="103" stroke="#26364b"/>
+    <path d="M818 121H889L969 201H1039" stroke="#b8f36b" stroke-width="3"/>
+    <path d="M814 288H895L974 209H1039" stroke="#4dd9ee" stroke-width="3"/>
+    <path d="M1040 201L1116 125H1190" stroke="#ae95ff" stroke-width="3"/>
+    <path d="M1040 209L1116 285H1190" stroke="#4dd9ee" stroke-width="3"/>
+    <path d="M1040 65V156M1040 258V349" stroke="#607493" stroke-width="2"/>
+    <rect x="990" y="157" width="100" height="100" rx="26" fill="#162732" stroke="#b8f36b" stroke-width="2"/>
+    <path d="M1008 207H1023L1033 183L1047 230L1059 207H1073" stroke="#b8f36b" stroke-width="4"/>
+  </g>
+  <g stroke-width="2">
+    <circle cx="818" cy="121" r="9" fill="#1c3026" stroke="#b8f36b"/>
+    <circle cx="814" cy="288" r="9" fill="#152e3c" stroke="#4dd9ee"/>
+    <circle cx="1190" cy="125" r="9" fill="#28233e" stroke="#ae95ff"/>
+    <circle cx="1190" cy="285" r="9" fill="#152e3c" stroke="#4dd9ee"/>
+    <circle cx="1040" cy="65" r="6" fill="#607493"/>
+    <circle cx="1040" cy="349" r="6" fill="#607493"/>
+  </g>
+</svg>
