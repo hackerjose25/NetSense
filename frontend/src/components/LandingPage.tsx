@@ -318,6 +318,16 @@ export default function LandingPage({ onEnterConsole }: LandingPageProps) {
               <p className="team-bio">
                 Researched the project concept and problem space, and contributed to frontend interface development and styling.
               </p>
+              <a
+                href="https://www.linkedin.com/in/dharshini-muthu-74b407329/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="team-linkedin-btn"
+                aria-label="Dharshini M LinkedIn"
+              >
+                <span>Connect on LinkedIn</span>
+                <ExternalLink size={13} />
+              </a>
             </article>
           </div>
         </div>
