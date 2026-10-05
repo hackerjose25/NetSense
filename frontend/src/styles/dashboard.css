@@ -2354,15 +2354,17 @@ td strong {
   }
 }
 
-/* Keep the supplied shield artwork intact on its original light background. */
 .brand-mark.project-logo {
+  width: 64px;
+  height: 64px;
   display: block;
-  object-fit: contain;
-  background: #fff;
-  padding: 2px;
+  object-fit: cover;
+  object-position: center;
+  background: transparent;
+  filter: brightness(1.2) contrast(1.15) drop-shadow(0 0 3px rgba(255, 255, 255, 0.28));
   flex-shrink: 0;
 }
 .landing-brand .project-logo {
-  width: 42px;
-  height: 42px;
+  width: 76px;
+  height: 76px;
 }

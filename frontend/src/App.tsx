@@ -217,7 +217,7 @@ export default function App() {
           }}
           title="Return to Landing Page"
         >
-          <img className="brand-mark project-logo" src={projectLogo} alt="NetSense shield logo" />
+          <img className="brand-mark project-logo" src={projectLogo} alt="NetSense logo" />
           NetSense<span className="brand-dot">.</span>
         </a>
         <nav aria-label="Main navigation">

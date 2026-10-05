@@ -17,6 +17,7 @@ import heroVideo from "../assets/hero-network.mp4";
 import heroPoster from "../assets/hero-poster.jpg";
 import joseAvatar from "../assets/jose.jpg";
 import gayathriAvatar from "../assets/gayathri.jpg";
+import dharshiniAvatar from "../assets/dharshini.jpeg";
 
 interface LandingPageProps {
   onEnterConsole: () => void;
@@ -51,7 +52,7 @@ export default function LandingPage({ onEnterConsole }: LandingPageProps) {
       {/* ─── Top Navigation Bar ─── */}
       <header className="landing-nav" aria-label="Landing navigation">
         <a href="#home" className="landing-brand">
-          <img className="brand-mark project-logo" src={projectLogo} alt="NetSense shield logo" />
+          <img className="brand-mark project-logo" src={projectLogo} alt="NetSense logo" />
           NetSense<span className="brand-dot">.</span>
         </a>
 
@@ -305,8 +306,12 @@ export default function LandingPage({ onEnterConsole }: LandingPageProps) {
 
             {/* Dharshini M */}
             <article className="team-card">
-              <div className="team-avatar-wrap placeholder">
-                <span className="team-avatar-initials">DM</span>
+              <div className="team-avatar-wrap">
+                <img
+                  src={dharshiniAvatar}
+                  alt="Dharshini M"
+                  className="team-avatar-img"
+                />
               </div>
               <h3 className="team-name">Dharshini M</h3>
               <span className="team-role">Frontend Developer</span>
@@ -321,7 +326,7 @@ export default function LandingPage({ onEnterConsole }: LandingPageProps) {
       {/* ─── Footer ─── */}
       <footer className="site-footer">
         <a href="#home" className="landing-brand">
-          <img className="brand-mark project-logo" src={projectLogo} alt="NetSense shield logo" />
+          <img className="brand-mark project-logo" src={projectLogo} alt="NetSense logo" />
           NetSense<span className="brand-dot">.</span>
         </a>
         <span>&copy; {new Date().getFullYear()} NetSense</span>

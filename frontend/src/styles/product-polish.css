@@ -72,7 +72,7 @@
 /* A single compact footer and quieter page framing. */
 .site-footer { max-width: 1264px; margin: 0 auto; padding: 28px 32px; border-top: 1px solid #ffffff14; display: flex; align-items: center; justify-content: space-between; gap: 24px; color: #aeb8c8; font-size: 12px; }
 .site-footer .landing-brand { font-size: 18px; }
-.site-footer .project-logo { width: 32px; height: 32px; }
+.site-footer .project-logo { width: 56px; height: 56px; }
 .site-footer .footer-back-top { display: inline-flex; align-items: center; gap: 8px; }
 .landing-container :is(.landing-platform, .landing-team, .landing-workflow) { grid-template-columns: minmax(0,1fr); max-width: 1200px; }
 .landing-container :is(.platform-container, .team-container) { width: 100%; max-width: none; }
