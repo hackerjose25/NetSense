@@ -73,11 +73,18 @@ NetSense turns IPv4/IPv6 packet headers captured by Scapy into a browsable dashb
 
 Captured from the current UI on **5 October 2026**, with the updated branding, red accents, and glass dashboard surfaces. Data views use the repository's bundled sample PCAP; the capture workspace is shown before starting a capture.
 
-**Network overview** — a saved sample session showing packet totals, protocol distribution, and top talkers.
+**Landing page** — the new NetSense identity, platform overview, workflow, and team.
+
+[![Updated NetSense landing page with the current logo, red accents, platform overview, and team](docs/screenshots/react-landing.png)](docs/screenshots/react-landing.png)
+
+**Click a screenshot to view it at full size, or expand a view below.**
+
+<details>
+<summary><strong>📊 Network overview — session totals, protocols, and top talkers</strong></summary>
 
 [![Updated NetSense network overview with red accents, glass panels, and a saved sample session](docs/screenshots/react-overview.png)](docs/screenshots/react-overview.png)
 
-**Click a screenshot to view it at full size, or expand a view below.**
+</details>
 
 <details>
 <summary><strong>🔴 Capture workspace — ready to start</strong></summary>
@@ -97,13 +104,6 @@ Captured from the current UI on **5 October 2026**, with the updated branding, r
 <summary><strong>🧠 Model analysis — sample results and class distributions</strong></summary>
 
 [![Updated NetSense model analysis showing sample packet-size classifications, class distributions, and window results](docs/screenshots/react-model-analysis.png)](docs/screenshots/react-model-analysis.png)
-
-</details>
-
-<details>
-<summary><strong>🟣 Landing page — enter the workspace</strong></summary>
-
-[![NetSense landing page](docs/screenshots/react-landing.png)](docs/screenshots/react-landing.png)
 
 </details>
 
